@@ -189,7 +189,7 @@
     <div class="pcm-field"><label>앨범 / 버전</label><input id="pcmFormEra" placeholder="예: 정규 5집 팬사인회 버전" /></div>
     <div class="pcm-field"><label id="pcmPriceLabel">희망 가격 (원)</label><input id="pcmFormPrice" type="number" min="0" placeholder="예: 8000" /></div>
     <div class="pcm-field"><label>설명</label><textarea id="pcmFormDesc" placeholder="상태, 교환 조건 등을 적어주세요"></textarea></div>
-    <div class="pcm-field"><label>오픈채팅 링크 또는 연락 방법</label><input id="pcmFormContact" placeholder="https://open.kakao.com/..." /></div>
+    <div class="pcm-field"><label>연락 방법</label><input id="pcmFormContact" placeholder="오픈채팅 링크, 카톡 ID, 인스타 계정 등 자유롭게" /></div>
 
     <div class="pcm-modal-actions">
       <button class="pcm-btn-cancel" id="pcmCancel">취소</button>
@@ -281,9 +281,14 @@
         ? (l.price ? Number(l.price).toLocaleString() + '원' : '가격 협의')
         : (l.price ? '희망가 ' + Number(l.price).toLocaleString() + '원' : '가격 협의');
       const isValidUrl = l.contact && /^https?:\/\//.test(l.contact);
-      const contactAttrs = isValidUrl
-        ? 'href="' + escapeHtml(l.contact) + '" target="_blank" rel="noopener noreferrer"'
-        : 'href="#" onclick="return false;" style="opacity:0.5;cursor:default;"';
+      let contactHtml;
+      if (isValidUrl) {
+        contactHtml = '<a class="pcm-contact-btn" href="' + escapeHtml(l.contact) + '" target="_blank" rel="noopener noreferrer">연락하기</a>';
+      } else if (l.contact && l.contact.trim()) {
+        contactHtml = '<button type="button" class="pcm-contact-btn pcm-copy-btn" data-contact="' + escapeHtml(l.contact.trim()) + '">연락처 복사</button>';
+      } else {
+        contactHtml = '<span class="pcm-contact-btn" style="opacity:0.4;cursor:default;">연락처 없음</span>';
+      }
       return '' +
         '<div class="pcm-card">' +
           '<span class="pcm-tag ' + l.type + '">' + tagLabel + '</span>' +
@@ -293,11 +298,23 @@
           '<div class="pcm-card-desc">' + escapeHtml(l.description || '') + '</div>' +
           '<div class="pcm-card-footer">' +
             '<span class="pcm-card-price">' + priceText + '</span>' +
-            '<a class="pcm-contact-btn" ' + contactAttrs + '>연락하기</a>' +
+            contactHtml +
           '</div>' +
         '</div>';
     }).join('');
   }
+
+  grid.addEventListener('click', async function(e){
+    const btn = e.target.closest('.pcm-copy-btn');
+    if (!btn) return;
+    const text = btn.getAttribute('data-contact') || '';
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast('연락처가 복사됐어요: ' + text);
+    } catch (err) {
+      showToast('복사에 실패했어요. 길게 눌러 직접 복사해주세요.');
+    }
+  });
 
   searchEl.addEventListener('input', render);
   groupFilterEl.addEventListener('change', function(){
@@ -314,7 +331,10 @@
     });
   });
 
-  function openModal(){ modalBackdrop.classList.add('open'); }
+  function openModal(){
+    modalBackdrop.classList.add('open');
+    setFormType('sell');
+  }
   function closeModal(){
     modalBackdrop.classList.remove('open');
     document.getElementById('pcmFormGroup').value = '';
@@ -339,6 +359,7 @@
   typeWantedBtn.addEventListener('click', function(){ setFormType('wanted'); });
 
   submitBtn.addEventListener('click', async function(){
+    const selectedType = typeWantedBtn.classList.contains('active') ? 'wanted' : 'sell';
     const group = document.getElementById('pcmFormGroup').value.trim();
     const member = document.getElementById('pcmFormMember').value.trim();
     const era = document.getElementById('pcmFormEra').value.trim();
@@ -358,7 +379,7 @@
       const res = await fetch('/api/listings', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ type: formType, group, member, era, price: price || null, description, contact }),
+        body: JSON.stringify({ type: selectedType, group, member, era, price: price || null, description, contact }),
       });
       if (!res.ok) throw new Error('등록 실패');
       await loadListings();

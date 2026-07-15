@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>포토카드 마켓 - 멤버 겹치는 포카 교환</title>
+<meta name="description" content="케이팝 포토카드 양도/구해요 게시판. 그룹, 멤버, 앨범 버전으로 검색하고 오픈채팅으로 바로 연락하세요.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink: #14132B;
+    --ink-2: #1E1C3F;
+    --card: #FBFAF7;
+    --card-line: #E4E1DA;
+    --text: #EDEBF5;
+    --muted: #9C98B8;
+    --holo-a: #FF6EC7;
+    --holo-b: #6EE7FF;
+    --holo-c: #FFD86E;
+    --sell: #FF6EC7;
+    --wanted: #6EE7FF;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--ink); }
+  body { font-family: 'Inter', sans-serif; color: var(--text); }
+  .pcm-display { font-family: 'Space Grotesk', sans-serif; }
+
+  .pcm-hero {
+    padding: 44px 28px 30px;
+    position: relative;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,110,199,0.16), transparent 45%),
+      radial-gradient(circle at 85% 0%, rgba(110,231,255,0.14), transparent 50%),
+      var(--ink);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .pcm-eyebrow {
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .pcm-eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg, var(--holo-a), var(--holo-b)); }
+  .pcm-title { font-size: 32px; font-weight: 700; line-height: 1.15; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .pcm-holo-word {
+    background: linear-gradient(100deg, var(--holo-a), var(--holo-c) 45%, var(--holo-b));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .pcm-sub { color: var(--muted); font-size: 14px; max-width: 480px; margin: 0 0 22px; line-height: 1.55; }
+
+  .pcm-binder {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(52px, 1fr)); gap: 6px;
+    max-width: 420px; padding: 8px; background: linear-gradient(180deg, #24224a, #1a1838);
+    border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);
+  }
+  .pcm-pocket { aspect-ratio: 3/4; border-radius: 5px; background: linear-gradient(160deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.10); position: relative; overflow: hidden; }
+  .pcm-pocket::after{ content:""; position:absolute; inset:0; background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.16) 45%, transparent 60%); transform: translateX(-100%); animation: pcmShine 5s ease-in-out infinite; }
+  .pcm-pocket:nth-child(2)::after{ animation-delay: .6s; }
+  .pcm-pocket:nth-child(5)::after{ animation-delay: 1.2s; }
+  .pcm-pocket:nth-child(7)::after{ animation-delay: 1.8s; }
+  @keyframes pcmShine { 0%, 92%, 100% { transform: translateX(-120%); } 96% { transform: translateX(120%); } }
+  .pcm-pocket.filled { background: linear-gradient(160deg, var(--holo-a), var(--holo-b)); opacity: 0.85; }
+
+  .pcm-controls {
+    position: sticky; top: 0; z-index: 5; background: rgba(20,19,43,0.92); backdrop-filter: blur(6px);
+    padding: 14px 28px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  }
+  .pcm-search { flex: 1 1 200px; background: var(--ink-2); border: 1px solid rgba(255,255,255,0.10); border-radius: 999px; padding: 10px 16px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
+  .pcm-search::placeholder { color: var(--muted); }
+  .pcm-search:focus { border-color: var(--holo-b); }
+  .pcm-select { background: var(--ink-2); border: 1px solid rgba(255,255,255,0.10); border-radius: 999px; padding: 10px 14px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
+  .pcm-select:focus { border-color: var(--holo-b); }
+  .pcm-toggle-group { display: flex; gap: 6px; background: var(--ink-2); padding: 4px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.10); }
+  .pcm-toggle { border: none; background: transparent; color: var(--muted); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 999px; cursor: pointer; }
+  .pcm-toggle.active { background: var(--text); color: var(--ink); }
+  .pcm-toggle:focus-visible, .pcm-search:focus-visible, .pcm-select:focus-visible { outline: 2px solid var(--holo-b); outline-offset: 1px; }
+
+  .pcm-grid-wrap { padding: 22px 28px 100px; max-width: 1100px; margin: 0 auto; }
+  .pcm-count { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .pcm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+
+  .pcm-card { background: var(--card); color: #221F3B; border-radius: var(--radius); padding: 14px; position: relative; box-shadow: 0 6px 18px rgba(0,0,0,0.25); border: 1px solid var(--card-line); display: flex; flex-direction: column; gap: 8px; }
+  .pcm-tag { position: absolute; top: -8px; left: 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; padding: 4px 10px; border-radius: 999px; color: #14132B; }
+  .pcm-tag.sell { background: var(--sell); }
+  .pcm-tag.wanted { background: var(--wanted); }
+  .pcm-card-group { font-size: 11px; color: #7A7694; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 6px;}
+  .pcm-card-member { font-size: 17px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+  .pcm-card-era { font-size: 12px; color: #57536E; }
+  .pcm-card-desc { font-size: 12.5px; color: #3D3A54; line-height: 1.45; flex: 1; }
+  .pcm-card-price { font-size: 15px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+  .pcm-card-footer { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 4px; }
+  .pcm-contact-btn { font-size: 12px; font-weight: 600; background: var(--ink); color: var(--text); border: none; padding: 8px 12px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-block; }
+  .pcm-contact-btn:hover { background: #2A2856; }
+  .pcm-empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; grid-column: 1 / -1; }
+
+  .pcm-fab { position: fixed; bottom: 22px; right: 22px; background: linear-gradient(120deg, var(--holo-a), var(--holo-b)); color: #14132B; border: none; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; padding: 14px 20px; border-radius: 999px; cursor: pointer; box-shadow: 0 8px 22px rgba(255,110,199,0.35); z-index: 6; }
+  .pcm-fab:hover { filter: brightness(1.05); }
+
+  .pcm-modal-backdrop { position: fixed; inset: 0; background: rgba(10,9,26,0.72); display: none; align-items: flex-end; justify-content: center; z-index: 10; }
+  .pcm-modal-backdrop.open { display: flex; }
+  .pcm-modal { background: var(--card); color: #221F3B; width: 100%; max-width: 480px; border-radius: 18px 18px 0 0; padding: 22px 22px 26px; max-height: 85%; overflow-y: auto; }
+  @media (min-width: 600px) {
+    .pcm-modal-backdrop { align-items: center; }
+    .pcm-modal { border-radius: 18px; margin-bottom: 40px; }
+  }
+  .pcm-modal h3 { font-family: 'Space Grotesk', sans-serif; margin: 0 0 4px; font-size: 19px; }
+  .pcm-modal p.pcm-modal-sub { margin: 0 0 16px; font-size: 12.5px; color: #6B6784; }
+  .pcm-field { margin-bottom: 12px; }
+  .pcm-field label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #45415D; }
+  .pcm-field input, .pcm-field textarea, .pcm-field select { width: 100%; border: 1px solid #DEDAE8; border-radius: 8px; padding: 9px 11px; font-family: 'Inter', sans-serif; font-size: 13px; background: #fff; color: #221F3B; }
+  .pcm-field textarea { resize: vertical; min-height: 60px; }
+  .pcm-field input:focus, .pcm-field textarea:focus, .pcm-field select:focus { outline: 2px solid var(--holo-b); border-color: transparent; }
+  .pcm-radio-row { display: flex; gap: 8px; }
+  .pcm-radio-btn { flex: 1; text-align: center; padding: 9px; border-radius: 8px; border: 1px solid #DEDAE8; font-size: 13px; font-weight: 600; cursor: pointer; color: #6B6784; }
+  .pcm-radio-btn.active.sell { background: var(--sell); border-color: var(--sell); color: #14132B; }
+  .pcm-radio-btn.active.wanted { background: var(--wanted); border-color: var(--wanted); color: #14132B; }
+  .pcm-modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .pcm-btn-cancel, .pcm-btn-submit { flex: 1; padding: 12px; border-radius: 999px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .pcm-btn-cancel { background: #EFEDF5; color: #45415D; }
+  .pcm-btn-submit { background: var(--ink); color: var(--text); }
+  .pcm-btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .pcm-notice { font-size: 11px; color: #8A86A0; margin-top: 10px; line-height: 1.5; }
+  .pcm-toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--ink); padding: 9px 16px; border-radius: 999px; font-size: 12.5px; font-weight: 600; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.25s ease, top 0.25s ease; }
+  .pcm-toast.show { opacity: 1; top: 26px; }
+
+  @media (max-width: 480px) {
+    .pcm-hero, .pcm-controls, .pcm-grid-wrap { padding-left: 16px; padding-right: 16px; }
+    .pcm-title { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="pcm-toast" id="pcmToast"></div>
+
+<div class="pcm-hero">
+  <div class="pcm-eyebrow">Photocard Exchange · Beta</div>
+  <h1 class="pcm-title">멤버 겹치는 포카,<br><span class="pcm-holo-word">여기서 맞바꿔요</span></h1>
+  <p class="pcm-sub">그룹·멤버·버전으로 검색하고, 오픈채팅으로 바로 연락하세요. 거래는 직거래 원칙, 안전결제는 준비 중이에요.</p>
+  <div class="pcm-binder">
+    <div class="pcm-pocket filled"></div>
+    <div class="pcm-pocket"></div>
+    <div class="pcm-pocket filled"></div>
+    <div class="pcm-pocket"></div>
+    <div class="pcm-pocket filled"></div>
+    <div class="pcm-pocket"></div>
+    <div class="pcm-pocket"></div>
+    <div class="pcm-pocket filled"></div>
+    <div class="pcm-pocket"></div>
+  </div>
+</div>
+
+<div class="pcm-controls">
+  <input class="pcm-search" id="pcmSearch" placeholder="그룹, 멤버, 앨범명으로 검색" />
+  <select class="pcm-select" id="pcmGroupFilter">
+    <option value="">전체 그룹</option>
+  </select>
+  <div class="pcm-toggle-group">
+    <button class="pcm-toggle active" data-type="all">전체</button>
+    <button class="pcm-toggle" data-type="sell">양도</button>
+    <button class="pcm-toggle" data-type="wanted">구해요</button>
+  </div>
+</div>
+
+<div class="pcm-grid-wrap">
+  <div class="pcm-count" id="pcmCount">불러오는 중...</div>
+  <div class="pcm-grid" id="pcmGrid"></div>
+</div>
+
+<button class="pcm-fab" id="pcmOpenModal">+ 매물 등록</button>
+
+<div class="pcm-modal-backdrop" id="pcmModalBackdrop">
+  <div class="pcm-modal">
+    <h3>매물 등록하기</h3>
+    <p class="pcm-modal-sub">등록한 정보는 모든 방문자에게 공개돼요.</p>
+
+    <div class="pcm-field">
+      <label>거래 유형</label>
+      <div class="pcm-radio-row">
+        <div class="pcm-radio-btn active sell" data-type="sell" id="pcmTypeSell">양도해요</div>
+        <div class="pcm-radio-btn wanted" data-type="wanted" id="pcmTypeWanted">구해요</div>
+      </div>
+    </div>
+    <div class="pcm-field"><label>그룹</label><input id="pcmFormGroup" placeholder="예: 세븐틴" /></div>
+    <div class="pcm-field"><label>멤버</label><input id="pcmFormMember" placeholder="예: 도겸" /></div>
+    <div class="pcm-field"><label>앨범 / 버전</label><input id="pcmFormEra" placeholder="예: 정규 5집 팬사인회 버전" /></div>
+    <div class="pcm-field"><label id="pcmPriceLabel">희망 가격 (원)</label><input id="pcmFormPrice" type="number" min="0" placeholder="예: 8000" /></div>
+    <div class="pcm-field"><label>설명</label><textarea id="pcmFormDesc" placeholder="상태, 교환 조건 등을 적어주세요"></textarea></div>
+    <div class="pcm-field"><label>오픈채팅 링크 또는 연락 방법</label><input id="pcmFormContact" placeholder="https://open.kakao.com/..." /></div>
+
+    <div class="pcm-modal-actions">
+      <button class="pcm-btn-cancel" id="pcmCancel">취소</button>
+      <button class="pcm-btn-submit" id="pcmSubmit">등록하기</button>
+    </div>
+    <p class="pcm-notice">거래는 이용자 간 직거래로 이뤄지며, 안전을 위해 선입금 요구나 시세보다 크게 저렴한 매물은 주의하세요.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  let listings = [];
+  let currentType = 'all';
+  let currentGroupFilter = '';
+  let formType = 'sell';
+
+  const grid = document.getElementById('pcmGrid');
+  const countEl = document.getElementById('pcmCount');
+  const searchEl = document.getElementById('pcmSearch');
+  const groupFilterEl = document.getElementById('pcmGroupFilter');
+  const toggles = document.querySelectorAll('.pcm-toggle');
+  const modalBackdrop = document.getElementById('pcmModalBackdrop');
+  const openModalBtn = document.getElementById('pcmOpenModal');
+  const cancelBtn = document.getElementById('pcmCancel');
+  const submitBtn = document.getElementById('pcmSubmit');
+  const typeSellBtn = document.getElementById('pcmTypeSell');
+  const typeWantedBtn = document.getElementById('pcmTypeWanted');
+  const priceLabel = document.getElementById('pcmPriceLabel');
+  const toast = document.getElementById('pcmToast');
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(()=> toast.classList.remove('show'), 2200);
+  }
+
+  function escapeHtml(str){
+    return (str || '').replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  async function loadListings(){
+    countEl.textContent = '불러오는 중...';
+    try {
+      const res = await fetch('/api/listings');
+      if (!res.ok) throw new Error('fetch failed');
+      const data = await res.json();
+      listings = data.listings || [];
+    } catch (e) {
+      listings = [];
+      countEl.textContent = '매물을 불러오지 못했어요. 새로고침 해주세요.';
+    }
+    render();
+  }
+
+  function populateGroupFilter(){
+    const groups = Array.from(new Set(listings.map(l => l.group).filter(Boolean))).sort();
+    const current = groupFilterEl.value;
+    groupFilterEl.innerHTML = '<option value="">전체 그룹</option>' +
+      groups.map(g => '<option value="' + escapeHtml(g) + '">' + escapeHtml(g) + '</option>').join('');
+    groupFilterEl.value = current;
+  }
+
+  function render(){
+    populateGroupFilter();
+    const q = searchEl.value.trim().toLowerCase();
+
+    let filtered = listings.filter(l => {
+      if (currentType !== 'all' && l.type !== currentType) return false;
+      if (currentGroupFilter && l.group !== currentGroupFilter) return false;
+      if (q) {
+        const hay = [l.group, l.member, l.era, l.description].join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+
+    countEl.textContent = filtered.length + '개의 매물';
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div class="pcm-empty">아직 조건에 맞는 매물이 없어요.<br>첫 매물을 등록해보세요.</div>';
+      return;
+    }
+
+    grid.innerHTML = filtered.map(l => {
+      const tagLabel = l.type === 'sell' ? '양도' : '구해요';
+      const priceText = l.type === 'sell'
+        ? (l.price ? Number(l.price).toLocaleString() + '원' : '가격 협의')
+        : (l.price ? '희망가 ' + Number(l.price).toLocaleString() + '원' : '가격 협의');
+      const isValidUrl = l.contact && /^https?:\/\//.test(l.contact);
+      const contactAttrs = isValidUrl
+        ? 'href="' + escapeHtml(l.contact) + '" target="_blank" rel="noopener noreferrer"'
+        : 'href="#" onclick="return false;" style="opacity:0.5;cursor:default;"';
+      return '' +
+        '<div class="pcm-card">' +
+          '<span class="pcm-tag ' + l.type + '">' + tagLabel + '</span>' +
+          '<div class="pcm-card-group">' + escapeHtml(l.group || '그룹 미지정') + '</div>' +
+          '<div class="pcm-card-member">' + escapeHtml(l.member || '멤버 미지정') + '</div>' +
+          '<div class="pcm-card-era">' + escapeHtml(l.era || '') + '</div>' +
+          '<div class="pcm-card-desc">' + escapeHtml(l.description || '') + '</div>' +
+          '<div class="pcm-card-footer">' +
+            '<span class="pcm-card-price">' + priceText + '</span>' +
+            '<a class="pcm-contact-btn" ' + contactAttrs + '>연락하기</a>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  searchEl.addEventListener('input', render);
+  groupFilterEl.addEventListener('change', function(){
+    currentGroupFilter = groupFilterEl.value;
+    render();
+  });
+
+  toggles.forEach(btn => {
+    btn.addEventListener('click', function(){
+      toggles.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentType = btn.getAttribute('data-type');
+      render();
+    });
+  });
+
+  function openModal(){ modalBackdrop.classList.add('open'); }
+  function closeModal(){
+    modalBackdrop.classList.remove('open');
+    document.getElementById('pcmFormGroup').value = '';
+    document.getElementById('pcmFormMember').value = '';
+    document.getElementById('pcmFormEra').value = '';
+    document.getElementById('pcmFormPrice').value = '';
+    document.getElementById('pcmFormDesc').value = '';
+    document.getElementById('pcmFormContact').value = '';
+  }
+
+  openModalBtn.addEventListener('click', openModal);
+  cancelBtn.addEventListener('click', closeModal);
+  modalBackdrop.addEventListener('click', function(e){ if (e.target === modalBackdrop) closeModal(); });
+
+  function setFormType(type){
+    formType = type;
+    typeSellBtn.classList.toggle('active', type === 'sell');
+    typeWantedBtn.classList.toggle('active', type === 'wanted');
+    priceLabel.textContent = type === 'sell' ? '희망 가격 (원)' : '지불 가능 가격 (원, 선택)';
+  }
+  typeSellBtn.addEventListener('click', function(){ setFormType('sell'); });
+  typeWantedBtn.addEventListener('click', function(){ setFormType('wanted'); });
+
+  submitBtn.addEventListener('click', async function(){
+    const group = document.getElementById('pcmFormGroup').value.trim();
+    const member = document.getElementById('pcmFormMember').value.trim();
+    const era = document.getElementById('pcmFormEra').value.trim();
+    const price = document.getElementById('pcmFormPrice').value.trim();
+    const description = document.getElementById('pcmFormDesc').value.trim();
+    const contact = document.getElementById('pcmFormContact').value.trim();
+
+    if (!group || !member) {
+      showToast('그룹과 멤버는 꼭 입력해주세요.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '등록 중...';
+
+    try {
+      const res = await fetch('/api/listings', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ type: formType, group, member, era, price: price || null, description, contact }),
+      });
+      if (!res.ok) throw new Error('등록 실패');
+      await loadListings();
+      closeModal();
+      showToast('매물이 등록됐어요!');
+    } catch (e) {
+      showToast('등록에 실패했어요. 다시 시도해주세요.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '등록하기';
+    }
+  });
+
+  loadListings();
+})();
+</script>
+</body>
+</html>

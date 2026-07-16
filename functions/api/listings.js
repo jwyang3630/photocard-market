@@ -15,7 +15,7 @@ export async function onRequestGet(context) {
   const { env } = context;
   try {
     const { results } = await env.DB
-      .prepare('SELECT id, type, group_name AS "group", member, era, price, description, contact, created_at AS createdAt FROM listings ORDER BY created_at DESC LIMIT 500')
+      .prepare('SELECT id, type, brand, model, size, condition, price, description, contact, image_url AS imageUrl, created_at AS createdAt FROM listings ORDER BY created_at DESC LIMIT 500')
       .all();
     return jsonResponse({ listings: results });
   } catch (err) {
@@ -33,40 +33,45 @@ export async function onRequestPost(context) {
     return jsonResponse({ error: 'INVALID_JSON' }, 400);
   }
 
-  const { type, group, member, era, price, description, contact } = body || {};
+  const { type, brand, model, size, condition, price, description, contact, imageUrl } = body || {};
 
   if (type !== 'sell' && type !== 'wanted') {
     return jsonResponse({ error: 'INVALID_TYPE' }, 400);
   }
-  if (!group || typeof group !== 'string' || !group.trim()) {
-    return jsonResponse({ error: 'GROUP_REQUIRED' }, 400);
+  if (!brand || typeof brand !== 'string' || !brand.trim()) {
+    return jsonResponse({ error: 'BRAND_REQUIRED' }, 400);
   }
-  if (!member || typeof member !== 'string' || !member.trim()) {
-    return jsonResponse({ error: 'MEMBER_REQUIRED' }, 400);
+  if (!model || typeof model !== 'string' || !model.trim()) {
+    return jsonResponse({ error: 'MODEL_REQUIRED' }, 400);
   }
 
-  // 아주 단순한 스팸 방지: 설명/연락처 길이 제한
-  const safeEra = (era || '').toString().slice(0, 200);
+  // 아주 단순한 스팸 방지: 설명/연락처/이미지URL 길이 제한
+  const safeSize = (size || '').toString().slice(0, 20);
+  const safeCondition = (condition || '').toString().slice(0, 30);
   const safeDesc = (description || '').toString().slice(0, 1000);
   const safeContact = (contact || '').toString().slice(0, 300);
+  const safeImageUrl = (imageUrl || '').toString().slice(0, 500);
   const safePrice = price !== null && price !== undefined && price !== '' ? Number(price) : null;
 
-  const id = 'l_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+  // 이미지 URL은 http(s)로 시작하는 경우만 허용 (그 외엔 저장하지 않음)
+  const validImageUrl = /^https?:\/\//.test(safeImageUrl) ? safeImageUrl : '';
+
+  const id = 's_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
   const createdAt = Date.now();
 
   try {
     await env.DB
       .prepare(
-        'INSERT INTO listings (id, type, group_name, member, era, price, description, contact, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO listings (id, type, brand, model, size, condition, price, description, contact, image_url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
       )
-      .bind(id, type, group.trim(), member.trim(), safeEra, safePrice, safeDesc, safeContact, createdAt)
+      .bind(id, type, brand.trim(), model.trim(), safeSize, safeCondition, safePrice, safeDesc, safeContact, validImageUrl, createdAt)
       .run();
 
     return jsonResponse({
       listing: {
-        id, type, group: group.trim(), member: member.trim(),
-        era: safeEra, price: safePrice, description: safeDesc,
-        contact: safeContact, createdAt,
+        id, type, brand: brand.trim(), model: model.trim(),
+        size: safeSize, condition: safeCondition, price: safePrice,
+        description: safeDesc, contact: safeContact, imageUrl: validImageUrl, createdAt,
       },
     }, 201);
   } catch (err) {

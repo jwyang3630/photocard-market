@@ -3,199 +3,224 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>포토카드 마켓 - 멤버 겹치는 포카 교환</title>
-<meta name="description" content="케이팝 포토카드 양도/구해요 게시판. 그룹, 멤버, 앨범 버전으로 검색하고 오픈채팅으로 바로 연락하세요.">
+<title>슈마켓 - 신발 리셀 직거래</title>
+<meta name="description" content="신발 리셀/직거래 게시판. 카드를 뒤집으면 실물 사진이 보여요. 브랜드, 모델, 사이즈로 검색하고 바로 연락하세요.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
   :root{
-    --ink: #14132B;
-    --ink-2: #1E1C3F;
-    --card: #FBFAF7;
-    --card-line: #E4E1DA;
-    --text: #EDEBF5;
-    --muted: #9C98B8;
-    --holo-a: #FF6EC7;
-    --holo-b: #6EE7FF;
-    --holo-c: #FFD86E;
-    --sell: #FF6EC7;
-    --wanted: #6EE7FF;
+    --ink: #171512;
+    --ink-2: #221E19;
+    --card: #FBF9F5;
+    --card-line: #E7E2D8;
+    --text: #F3EFE7;
+    --muted: #A69C8C;
+    --accent-a: #FF7A3D;
+    --accent-b: #FFB84D;
+    --accent-c: #7FE0C4;
+    --sell: #FF7A3D;
+    --wanted: #7FE0C4;
     --radius: 14px;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: var(--ink); }
   body { font-family: 'Inter', sans-serif; color: var(--text); }
-  .pcm-display { font-family: 'Space Grotesk', sans-serif; }
+  .srm-display { font-family: 'Space Grotesk', sans-serif; }
 
-  .pcm-hero {
+  .srm-hero {
     padding: 44px 28px 30px;
     position: relative;
     background:
-      radial-gradient(circle at 15% 20%, rgba(255,110,199,0.16), transparent 45%),
-      radial-gradient(circle at 85% 0%, rgba(110,231,255,0.14), transparent 50%),
+      radial-gradient(circle at 15% 20%, rgba(255,122,61,0.16), transparent 45%),
+      radial-gradient(circle at 85% 0%, rgba(127,224,196,0.14), transparent 50%),
       var(--ink);
     border-bottom: 1px solid rgba(255,255,255,0.06);
   }
-  .pcm-eyebrow {
+  .srm-eyebrow {
     font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
   }
-  .pcm-eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg, var(--holo-a), var(--holo-b)); }
-  .pcm-title { font-size: 32px; font-weight: 700; line-height: 1.15; margin: 0 0 8px; letter-spacing: -0.01em; }
-  .pcm-holo-word {
-    background: linear-gradient(100deg, var(--holo-a), var(--holo-c) 45%, var(--holo-b));
+  .srm-eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-a), var(--accent-c)); }
+  .srm-title { font-size: 32px; font-weight: 700; line-height: 1.15; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .srm-accent-word {
+    background: linear-gradient(100deg, var(--accent-a), var(--accent-b) 45%, var(--accent-c));
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  .pcm-sub { color: var(--muted); font-size: 14px; max-width: 480px; margin: 0 0 22px; line-height: 1.55; }
+  .srm-sub { color: var(--muted); font-size: 14px; max-width: 480px; margin: 0 0 22px; line-height: 1.55; }
 
-  .pcm-binder {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(52px, 1fr)); gap: 6px;
-    max-width: 420px; padding: 8px; background: linear-gradient(180deg, #24224a, #1a1838);
+  .srm-hint {
+    display: flex; align-items: center; gap: 10px; max-width: 420px; padding: 12px 14px;
+    background: linear-gradient(180deg, #2A241C, #1C1712);
     border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px; color: var(--muted);
   }
-  .pcm-pocket { aspect-ratio: 3/4; border-radius: 5px; background: linear-gradient(160deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.10); position: relative; overflow: hidden; }
-  .pcm-pocket::after{ content:""; position:absolute; inset:0; background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.16) 45%, transparent 60%); transform: translateX(-100%); animation: pcmShine 5s ease-in-out infinite; }
-  .pcm-pocket:nth-child(2)::after{ animation-delay: .6s; }
-  .pcm-pocket:nth-child(5)::after{ animation-delay: 1.2s; }
-  .pcm-pocket:nth-child(7)::after{ animation-delay: 1.8s; }
-  @keyframes pcmShine { 0%, 92%, 100% { transform: translateX(-120%); } 96% { transform: translateX(120%); } }
-  .pcm-pocket.filled { background: linear-gradient(160deg, var(--holo-a), var(--holo-b)); opacity: 0.85; }
+  .srm-hint-icon { font-size: 18px; flex-shrink: 0; }
 
-  .pcm-controls {
-    position: sticky; top: 0; z-index: 5; background: rgba(20,19,43,0.92); backdrop-filter: blur(6px);
+  .srm-controls {
+    position: sticky; top: 0; z-index: 5; background: rgba(23,21,18,0.92); backdrop-filter: blur(6px);
     padding: 14px 28px; border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
   }
-  .pcm-search { flex: 1 1 200px; background: var(--ink-2); border: 1px solid rgba(255,255,255,0.10); border-radius: 999px; padding: 10px 16px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
-  .pcm-search::placeholder { color: var(--muted); }
-  .pcm-search:focus { border-color: var(--holo-b); }
-  .pcm-select { background: var(--ink-2); border: 1px solid rgba(255,255,255,0.10); border-radius: 999px; padding: 10px 14px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
-  .pcm-select:focus { border-color: var(--holo-b); }
-  .pcm-toggle-group { display: flex; gap: 6px; background: var(--ink-2); padding: 4px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.10); }
-  .pcm-toggle { border: none; background: transparent; color: var(--muted); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 999px; cursor: pointer; }
-  .pcm-toggle.active { background: var(--text); color: var(--ink); }
-  .pcm-toggle:focus-visible, .pcm-search:focus-visible, .pcm-select:focus-visible { outline: 2px solid var(--holo-b); outline-offset: 1px; }
+  .srm-search { flex: 1 1 200px; background: var(--ink-2); border: 1px solid rgba(255,255,255,0.10); border-radius: 999px; padding: 10px 16px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
+  .srm-search::placeholder { color: var(--muted); }
+  .srm-search:focus { border-color: var(--accent-c); }
+  .srm-select { background: var(--ink-2); border: 1px solid rgba(255,255,255,0.10); border-radius: 999px; padding: 10px 14px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
+  .srm-select:focus { border-color: var(--accent-c); }
+  .srm-toggle-group { display: flex; gap: 6px; background: var(--ink-2); padding: 4px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.10); }
+  .srm-toggle { border: none; background: transparent; color: var(--muted); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 999px; cursor: pointer; }
+  .srm-toggle.active { background: var(--text); color: var(--ink); }
+  .srm-toggle:focus-visible, .srm-search:focus-visible, .srm-select:focus-visible { outline: 2px solid var(--accent-c); outline-offset: 1px; }
 
-  .pcm-grid-wrap { padding: 22px 28px 100px; max-width: 1100px; margin: 0 auto; }
-  .pcm-count { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
-  .pcm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .srm-grid-wrap { padding: 22px 28px 100px; max-width: 1100px; margin: 0 auto; }
+  .srm-count { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .srm-flip-tip { font-size: 11.5px; color: var(--muted); margin-bottom: 14px; }
+  .srm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
 
-  .pcm-card { background: var(--card); color: #221F3B; border-radius: var(--radius); padding: 14px; position: relative; box-shadow: 0 6px 18px rgba(0,0,0,0.25); border: 1px solid var(--card-line); display: flex; flex-direction: column; gap: 8px; }
-  .pcm-tag { position: absolute; top: -8px; left: 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; padding: 4px 10px; border-radius: 999px; color: #14132B; }
-  .pcm-tag.sell { background: var(--sell); }
-  .pcm-tag.wanted { background: var(--wanted); }
-  .pcm-card-group { font-size: 11px; color: #7A7694; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 6px;}
-  .pcm-card-member { font-size: 17px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
-  .pcm-card-era { font-size: 12px; color: #57536E; }
-  .pcm-card-desc { font-size: 12.5px; color: #3D3A54; line-height: 1.45; flex: 1; }
-  .pcm-card-price { font-size: 15px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
-  .pcm-card-footer { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 4px; }
-  .pcm-contact-btn { font-size: 12px; font-weight: 600; background: var(--ink); color: var(--text); border: none; padding: 8px 12px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-block; }
-  .pcm-contact-btn:hover { background: #2A2856; }
-  .pcm-empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; grid-column: 1 / -1; }
-
-  .pcm-fab { position: fixed; bottom: 22px; right: 22px; background: linear-gradient(120deg, var(--holo-a), var(--holo-b)); color: #14132B; border: none; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; padding: 14px 20px; border-radius: 999px; cursor: pointer; box-shadow: 0 8px 22px rgba(255,110,199,0.35); z-index: 6; }
-  .pcm-fab:hover { filter: brightness(1.05); }
-
-  .pcm-modal-backdrop { position: fixed; inset: 0; background: rgba(10,9,26,0.72); display: none; align-items: flex-end; justify-content: center; z-index: 10; }
-  .pcm-modal-backdrop.open { display: flex; }
-  .pcm-modal { background: var(--card); color: #221F3B; width: 100%; max-width: 480px; border-radius: 18px 18px 0 0; padding: 22px 22px 26px; max-height: 85%; overflow-y: auto; }
-  @media (min-width: 600px) {
-    .pcm-modal-backdrop { align-items: center; }
-    .pcm-modal { border-radius: 18px; margin-bottom: 40px; }
+  /* --- Flip card --- */
+  .srm-card-scene { perspective: 1200px; }
+  .srm-card {
+    position: relative; width: 100%; min-height: 250px;
+    transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(.4,.2,.2,1);
+    cursor: pointer;
   }
-  .pcm-modal h3 { font-family: 'Space Grotesk', sans-serif; margin: 0 0 4px; font-size: 19px; }
-  .pcm-modal p.pcm-modal-sub { margin: 0 0 16px; font-size: 12.5px; color: #6B6784; }
-  .pcm-field { margin-bottom: 12px; }
-  .pcm-field label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #45415D; }
-  .pcm-field input, .pcm-field textarea, .pcm-field select { width: 100%; border: 1px solid #DEDAE8; border-radius: 8px; padding: 9px 11px; font-family: 'Inter', sans-serif; font-size: 13px; background: #fff; color: #221F3B; }
-  .pcm-field textarea { resize: vertical; min-height: 60px; }
-  .pcm-field input:focus, .pcm-field textarea:focus, .pcm-field select:focus { outline: 2px solid var(--holo-b); border-color: transparent; }
-  .pcm-radio-row { display: flex; gap: 8px; }
-  .pcm-radio-btn { flex: 1; text-align: center; padding: 9px; border-radius: 8px; border: 1px solid #DEDAE8; font-size: 13px; font-weight: 600; cursor: pointer; color: #6B6784; }
-  .pcm-radio-btn.active.sell { background: var(--sell); border-color: var(--sell); color: #14132B; }
-  .pcm-radio-btn.active.wanted { background: var(--wanted); border-color: var(--wanted); color: #14132B; }
-  .pcm-modal-actions { display: flex; gap: 10px; margin-top: 18px; }
-  .pcm-btn-cancel, .pcm-btn-submit { flex: 1; padding: 12px; border-radius: 999px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; font-family: 'Inter', sans-serif; }
-  .pcm-btn-cancel { background: #EFEDF5; color: #45415D; }
-  .pcm-btn-submit { background: var(--ink); color: var(--text); }
-  .pcm-btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-  .pcm-notice { font-size: 11px; color: #8A86A0; margin-top: 10px; line-height: 1.5; }
-  .pcm-toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--ink); padding: 9px 16px; border-radius: 999px; font-size: 12.5px; font-weight: 600; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.25s ease, top 0.25s ease; }
-  .pcm-toast.show { opacity: 1; top: 26px; }
+  .srm-card.flipped { transform: rotateY(180deg); }
+  .srm-card-face {
+    position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: var(--radius); border: 1px solid var(--card-line);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+    display: flex; flex-direction: column;
+  }
+  .srm-card-front { background: var(--card); color: #221F3B; padding: 14px; gap: 8px; }
+  .srm-card-back {
+    background: #100E0B; transform: rotateY(180deg); align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .srm-card-back img { width: 100%; height: 100%; object-fit: cover; }
+  .srm-card-back .srm-noimg { color: var(--muted); font-size: 12px; text-align: center; padding: 20px; }
+  .srm-flip-icon {
+    position: absolute; bottom: 8px; right: 8px; font-size: 11px; color: #9C98B8;
+    background: rgba(255,255,255,0.6); padding: 3px 8px; border-radius: 999px;
+  }
+
+  .srm-tag { position: absolute; top: -8px; left: 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; padding: 4px 10px; border-radius: 999px; color: #171512; z-index: 2; }
+  .srm-tag.sell { background: var(--sell); }
+  .srm-tag.wanted { background: var(--wanted); }
+  .srm-card-brand { font-size: 11px; color: #7A7466; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 6px;}
+  .srm-card-model { font-size: 16px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; line-height: 1.25; }
+  .srm-card-meta { font-size: 12px; color: #57503E; }
+  .srm-card-desc { font-size: 12.5px; color: #3D3A2E; line-height: 1.45; flex: 1; }
+  .srm-card-price { font-size: 15px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+  .srm-card-footer { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 4px; }
+  .srm-contact-btn { font-size: 12px; font-weight: 600; background: var(--ink); color: var(--text); border: none; padding: 8px 12px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-block; }
+  .srm-contact-btn:hover { background: #322C22; }
+  .srm-empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; grid-column: 1 / -1; }
+
+  .srm-fab { position: fixed; bottom: 22px; right: 22px; background: linear-gradient(120deg, var(--accent-a), var(--accent-b)); color: #171512; border: none; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; padding: 14px 20px; border-radius: 999px; cursor: pointer; box-shadow: 0 8px 22px rgba(255,122,61,0.35); z-index: 6; }
+  .srm-fab:hover { filter: brightness(1.05); }
+
+  .srm-modal-backdrop { position: fixed; inset: 0; background: rgba(10,9,7,0.72); display: none; align-items: flex-end; justify-content: center; z-index: 10; }
+  .srm-modal-backdrop.open { display: flex; }
+  .srm-modal { background: var(--card); color: #221F3B; width: 100%; max-width: 480px; border-radius: 18px 18px 0 0; padding: 22px 22px 26px; max-height: 85%; overflow-y: auto; }
+  @media (min-width: 600px) {
+    .srm-modal-backdrop { align-items: center; }
+    .srm-modal { border-radius: 18px; margin-bottom: 40px; }
+  }
+  .srm-modal h3 { font-family: 'Space Grotesk', sans-serif; margin: 0 0 4px; font-size: 19px; }
+  .srm-modal p.srm-modal-sub { margin: 0 0 16px; font-size: 12.5px; color: #6B6558; }
+  .srm-field { margin-bottom: 12px; }
+  .srm-field label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #45402F; }
+  .srm-field input, .srm-field textarea, .srm-field select { width: 100%; border: 1px solid #DEDACC; border-radius: 8px; padding: 9px 11px; font-family: 'Inter', sans-serif; font-size: 13px; background: #fff; color: #221F3B; }
+  .srm-field textarea { resize: vertical; min-height: 60px; }
+  .srm-field input:focus, .srm-field textarea:focus, .srm-field select:focus { outline: 2px solid var(--accent-c); border-color: transparent; }
+  .srm-radio-row { display: flex; gap: 8px; }
+  .srm-radio-btn { flex: 1; text-align: center; padding: 9px; border-radius: 8px; border: 1px solid #DEDACC; font-size: 13px; font-weight: 600; cursor: pointer; color: #6B6558; }
+  .srm-radio-btn.active.sell { background: var(--sell); border-color: var(--sell); color: #171512; }
+  .srm-radio-btn.active.wanted { background: var(--wanted); border-color: var(--wanted); color: #171512; }
+  .srm-modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .srm-btn-cancel, .srm-btn-submit { flex: 1; padding: 12px; border-radius: 999px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .srm-btn-cancel { background: #EFEBDF; color: #45402F; }
+  .srm-btn-submit { background: var(--ink); color: var(--text); }
+  .srm-btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .srm-notice { font-size: 11px; color: #8A8474; margin-top: 10px; line-height: 1.5; }
+  .srm-toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--ink); padding: 9px 16px; border-radius: 999px; font-size: 12.5px; font-weight: 600; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.25s ease, top 0.25s ease; }
+  .srm-toast.show { opacity: 1; top: 26px; }
 
   @media (max-width: 480px) {
-    .pcm-hero, .pcm-controls, .pcm-grid-wrap { padding-left: 16px; padding-right: 16px; }
-    .pcm-title { font-size: 24px; }
+    .srm-hero, .srm-controls, .srm-grid-wrap { padding-left: 16px; padding-right: 16px; }
+    .srm-title { font-size: 24px; }
   }
 </style>
 </head>
 <body>
 
-<div class="pcm-toast" id="pcmToast"></div>
+<div class="srm-toast" id="srmToast"></div>
 
-<div class="pcm-hero">
-  <div class="pcm-eyebrow">Photocard Exchange · Beta</div>
-  <h1 class="pcm-title">멤버 겹치는 포카,<br><span class="pcm-holo-word">여기서 맞바꿔요</span></h1>
-  <p class="pcm-sub">그룹·멤버·버전으로 검색하고, 오픈채팅으로 바로 연락하세요. 거래는 직거래 원칙, 안전결제는 준비 중이에요.</p>
-  <div class="pcm-binder">
-    <div class="pcm-pocket filled"></div>
-    <div class="pcm-pocket"></div>
-    <div class="pcm-pocket filled"></div>
-    <div class="pcm-pocket"></div>
-    <div class="pcm-pocket filled"></div>
-    <div class="pcm-pocket"></div>
-    <div class="pcm-pocket"></div>
-    <div class="pcm-pocket filled"></div>
-    <div class="pcm-pocket"></div>
+<div class="srm-hero">
+  <div class="srm-eyebrow">Sneaker Resell · Beta</div>
+  <h1 class="srm-title">신발 직거래,<br><span class="srm-accent-word">카드를 뒤집어 확인해요</span></h1>
+  <p class="srm-sub">브랜드·모델·사이즈로 검색하고, 카드를 눌러 뒤집으면 실물 사진이 보여요. 거래는 직거래 원칙, 안전결제는 준비 중이에요.</p>
+  <div class="srm-hint">
+    <span class="srm-hint-icon">🔄</span>
+    <span>카드를 클릭하면 뒤집혀서 실물 사진이 나와요</span>
   </div>
 </div>
 
-<div class="pcm-controls">
-  <input class="pcm-search" id="pcmSearch" placeholder="그룹, 멤버, 앨범명으로 검색" />
-  <select class="pcm-select" id="pcmGroupFilter">
-    <option value="">전체 그룹</option>
+<div class="srm-controls">
+  <input class="srm-search" id="srmSearch" placeholder="브랜드, 모델명으로 검색" />
+  <select class="srm-select" id="srmBrandFilter">
+    <option value="">전체 브랜드</option>
   </select>
-  <div class="pcm-toggle-group">
-    <button class="pcm-toggle active" data-type="all">전체</button>
-    <button class="pcm-toggle" data-type="sell">양도</button>
-    <button class="pcm-toggle" data-type="wanted">구해요</button>
+  <div class="srm-toggle-group">
+    <button class="srm-toggle active" data-type="all">전체</button>
+    <button class="srm-toggle" data-type="sell">판매</button>
+    <button class="srm-toggle" data-type="wanted">구해요</button>
   </div>
 </div>
 
-<div class="pcm-grid-wrap">
-  <div class="pcm-count" id="pcmCount">불러오는 중...</div>
-  <div class="pcm-grid" id="pcmGrid"></div>
+<div class="srm-grid-wrap">
+  <div class="srm-count" id="srmCount">불러오는 중...</div>
+  <div class="srm-flip-tip">카드를 탭/클릭하면 실물 사진으로 뒤집혀요</div>
+  <div class="srm-grid" id="srmGrid"></div>
 </div>
 
-<button class="pcm-fab" id="pcmOpenModal">+ 매물 등록</button>
+<button class="srm-fab" id="srmOpenModal">+ 매물 등록</button>
 
-<div class="pcm-modal-backdrop" id="pcmModalBackdrop">
-  <div class="pcm-modal">
+<div class="srm-modal-backdrop" id="srmModalBackdrop">
+  <div class="srm-modal">
     <h3>매물 등록하기</h3>
-    <p class="pcm-modal-sub">등록한 정보는 모든 방문자에게 공개돼요.</p>
+    <p class="srm-modal-sub">등록한 정보는 모든 방문자에게 공개돼요.</p>
 
-    <div class="pcm-field">
+    <div class="srm-field">
       <label>거래 유형</label>
-      <div class="pcm-radio-row">
-        <div class="pcm-radio-btn active sell" data-type="sell" id="pcmTypeSell">양도해요</div>
-        <div class="pcm-radio-btn wanted" data-type="wanted" id="pcmTypeWanted">구해요</div>
+      <div class="srm-radio-row">
+        <div class="srm-radio-btn active sell" data-type="sell" id="srmTypeSell">판매해요</div>
+        <div class="srm-radio-btn wanted" data-type="wanted" id="srmTypeWanted">구해요</div>
       </div>
     </div>
-    <div class="pcm-field"><label>그룹</label><input id="pcmFormGroup" placeholder="예: 세븐틴" /></div>
-    <div class="pcm-field"><label>멤버</label><input id="pcmFormMember" placeholder="예: 도겸" /></div>
-    <div class="pcm-field"><label>앨범 / 버전</label><input id="pcmFormEra" placeholder="예: 정규 5집 팬사인회 버전" /></div>
-    <div class="pcm-field"><label id="pcmPriceLabel">희망 가격 (원)</label><input id="pcmFormPrice" type="number" min="0" placeholder="예: 8000" /></div>
-    <div class="pcm-field"><label>설명</label><textarea id="pcmFormDesc" placeholder="상태, 교환 조건 등을 적어주세요"></textarea></div>
-    <div class="pcm-field"><label>연락 방법</label><input id="pcmFormContact" placeholder="오픈채팅 링크, 카톡 ID, 인스타 계정 등 자유롭게" /></div>
-
-    <div class="pcm-modal-actions">
-      <button class="pcm-btn-cancel" id="pcmCancel">취소</button>
-      <button class="pcm-btn-submit" id="pcmSubmit">등록하기</button>
+    <div class="srm-field"><label>브랜드</label><input id="srmFormBrand" placeholder="예: 나이키" /></div>
+    <div class="srm-field"><label>모델명</label><input id="srmFormModel" placeholder="예: 덩크 로우 판다" /></div>
+    <div class="srm-field"><label>사이즈 (mm)</label><input id="srmFormSize" placeholder="예: 270" /></div>
+    <div class="srm-field">
+      <label>컨디션</label>
+      <select id="srmFormCondition">
+        <option value="새제품">새제품 (미착용)</option>
+        <option value="거의새것">거의 새것 (착용 1-2회)</option>
+        <option value="중고 상태 좋음">중고 - 상태 좋음</option>
+        <option value="중고 사용감 있음">중고 - 사용감 있음</option>
+      </select>
     </div>
-    <p class="pcm-notice">거래는 이용자 간 직거래로 이뤄지며, 안전을 위해 선입금 요구나 시세보다 크게 저렴한 매물은 주의하세요.</p>
+    <div class="srm-field"><label id="srmPriceLabel">희망 가격 (원)</label><input id="srmFormPrice" type="number" min="0" placeholder="예: 120000" /></div>
+    <div class="srm-field"><label>실물 사진 URL</label><input id="srmFormImage" placeholder="네이버 블로그/이미지 호스팅 링크 (http로 시작)" /></div>
+    <div class="srm-field"><label>설명</label><textarea id="srmFormDesc" placeholder="박스 유무, 하자 여부, 구매처 등을 적어주세요"></textarea></div>
+    <div class="srm-field"><label>연락 방법</label><input id="srmFormContact" placeholder="오픈채팅 링크, 카톡 ID, 인스타 계정 등 자유롭게" /></div>
+
+    <div class="srm-modal-actions">
+      <button class="srm-btn-cancel" id="srmCancel">취소</button>
+      <button class="srm-btn-submit" id="srmSubmit">등록하기</button>
+    </div>
+    <p class="srm-notice">거래는 이용자 간 직거래로 이뤄지며, 안전을 위해 선입금 요구나 시세보다 크게 저렴한 매물, 정품 여부가 불확실한 매물은 주의하세요.</p>
   </div>
 </div>
 
@@ -203,22 +228,22 @@
 (function(){
   let listings = [];
   let currentType = 'all';
-  let currentGroupFilter = '';
+  let currentBrandFilter = '';
   let formType = 'sell';
 
-  const grid = document.getElementById('pcmGrid');
-  const countEl = document.getElementById('pcmCount');
-  const searchEl = document.getElementById('pcmSearch');
-  const groupFilterEl = document.getElementById('pcmGroupFilter');
-  const toggles = document.querySelectorAll('.pcm-toggle');
-  const modalBackdrop = document.getElementById('pcmModalBackdrop');
-  const openModalBtn = document.getElementById('pcmOpenModal');
-  const cancelBtn = document.getElementById('pcmCancel');
-  const submitBtn = document.getElementById('pcmSubmit');
-  const typeSellBtn = document.getElementById('pcmTypeSell');
-  const typeWantedBtn = document.getElementById('pcmTypeWanted');
-  const priceLabel = document.getElementById('pcmPriceLabel');
-  const toast = document.getElementById('pcmToast');
+  const grid = document.getElementById('srmGrid');
+  const countEl = document.getElementById('srmCount');
+  const searchEl = document.getElementById('srmSearch');
+  const brandFilterEl = document.getElementById('srmBrandFilter');
+  const toggles = document.querySelectorAll('.srm-toggle');
+  const modalBackdrop = document.getElementById('srmModalBackdrop');
+  const openModalBtn = document.getElementById('srmOpenModal');
+  const cancelBtn = document.getElementById('srmCancel');
+  const submitBtn = document.getElementById('srmSubmit');
+  const typeSellBtn = document.getElementById('srmTypeSell');
+  const typeWantedBtn = document.getElementById('srmTypeWanted');
+  const priceLabel = document.getElementById('srmPriceLabel');
+  const toast = document.getElementById('srmToast');
 
   function showToast(msg){
     toast.textContent = msg;
@@ -246,23 +271,23 @@
     render();
   }
 
-  function populateGroupFilter(){
-    const groups = Array.from(new Set(listings.map(l => l.group).filter(Boolean))).sort();
-    const current = groupFilterEl.value;
-    groupFilterEl.innerHTML = '<option value="">전체 그룹</option>' +
-      groups.map(g => '<option value="' + escapeHtml(g) + '">' + escapeHtml(g) + '</option>').join('');
-    groupFilterEl.value = current;
+  function populateBrandFilter(){
+    const brands = Array.from(new Set(listings.map(l => l.brand).filter(Boolean))).sort();
+    const current = brandFilterEl.value;
+    brandFilterEl.innerHTML = '<option value="">전체 브랜드</option>' +
+      brands.map(b => '<option value="' + escapeHtml(b) + '">' + escapeHtml(b) + '</option>').join('');
+    brandFilterEl.value = current;
   }
 
   function render(){
-    populateGroupFilter();
+    populateBrandFilter();
     const q = searchEl.value.trim().toLowerCase();
 
     let filtered = listings.filter(l => {
       if (currentType !== 'all' && l.type !== currentType) return false;
-      if (currentGroupFilter && l.group !== currentGroupFilter) return false;
+      if (currentBrandFilter && l.brand !== currentBrandFilter) return false;
       if (q) {
-        const hay = [l.group, l.member, l.era, l.description].join(' ').toLowerCase();
+        const hay = [l.brand, l.model, l.size, l.description].join(' ').toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -271,54 +296,75 @@
     countEl.textContent = filtered.length + '개의 매물';
 
     if (filtered.length === 0) {
-      grid.innerHTML = '<div class="pcm-empty">아직 조건에 맞는 매물이 없어요.<br>첫 매물을 등록해보세요.</div>';
+      grid.innerHTML = '<div class="srm-empty">아직 조건에 맞는 매물이 없어요.<br>첫 매물을 등록해보세요.</div>';
       return;
     }
 
     grid.innerHTML = filtered.map(l => {
-      const tagLabel = l.type === 'sell' ? '양도' : '구해요';
+      const tagLabel = l.type === 'sell' ? '판매' : '구해요';
       const priceText = l.type === 'sell'
         ? (l.price ? Number(l.price).toLocaleString() + '원' : '가격 협의')
         : (l.price ? '희망가 ' + Number(l.price).toLocaleString() + '원' : '가격 협의');
       const isValidUrl = l.contact && /^https?:\/\//.test(l.contact);
       let contactHtml;
       if (isValidUrl) {
-        contactHtml = '<a class="pcm-contact-btn" href="' + escapeHtml(l.contact) + '" target="_blank" rel="noopener noreferrer">연락하기</a>';
+        contactHtml = '<a class="srm-contact-btn" href="' + escapeHtml(l.contact) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">연락하기</a>';
       } else if (l.contact && l.contact.trim()) {
-        contactHtml = '<button type="button" class="pcm-contact-btn pcm-copy-btn" data-contact="' + escapeHtml(l.contact.trim()) + '">연락처 복사</button>';
+        contactHtml = '<button type="button" class="srm-contact-btn srm-copy-btn" data-contact="' + escapeHtml(l.contact.trim()) + '">연락처 복사</button>';
       } else {
-        contactHtml = '<span class="pcm-contact-btn" style="opacity:0.4;cursor:default;">연락처 없음</span>';
+        contactHtml = '<span class="srm-contact-btn" style="opacity:0.4;cursor:default;">연락처 없음</span>';
       }
+      const sizeMeta = l.size ? l.size + 'mm' : '사이즈 미정';
+      const condMeta = l.condition ? ' · ' + escapeHtml(l.condition) : '';
+      const backContent = l.imageUrl
+        ? '<img src="' + escapeHtml(l.imageUrl) + '" alt="' + escapeHtml(l.model || '') + ' 실물 사진" loading="lazy" />'
+        : '<div class="srm-noimg">등록된 실물 사진이 없어요</div>';
+
       return '' +
-        '<div class="pcm-card">' +
-          '<span class="pcm-tag ' + l.type + '">' + tagLabel + '</span>' +
-          '<div class="pcm-card-group">' + escapeHtml(l.group || '그룹 미지정') + '</div>' +
-          '<div class="pcm-card-member">' + escapeHtml(l.member || '멤버 미지정') + '</div>' +
-          '<div class="pcm-card-era">' + escapeHtml(l.era || '') + '</div>' +
-          '<div class="pcm-card-desc">' + escapeHtml(l.description || '') + '</div>' +
-          '<div class="pcm-card-footer">' +
-            '<span class="pcm-card-price">' + priceText + '</span>' +
-            contactHtml +
+        '<div class="srm-card-scene">' +
+          '<div class="srm-card" data-id="' + escapeHtml(l.id) + '">' +
+            '<div class="srm-card-face srm-card-front">' +
+              '<span class="srm-tag ' + l.type + '">' + tagLabel + '</span>' +
+              '<div class="srm-card-brand">' + escapeHtml(l.brand || '브랜드 미지정') + '</div>' +
+              '<div class="srm-card-model">' + escapeHtml(l.model || '모델 미지정') + '</div>' +
+              '<div class="srm-card-meta">' + escapeHtml(sizeMeta) + condMeta + '</div>' +
+              '<div class="srm-card-desc">' + escapeHtml(l.description || '') + '</div>' +
+              '<div class="srm-card-footer">' +
+                '<span class="srm-card-price">' + priceText + '</span>' +
+                contactHtml +
+              '</div>' +
+            '</div>' +
+            '<div class="srm-card-face srm-card-back">' +
+              backContent +
+              '<span class="srm-flip-icon">← 정보로</span>' +
+            '</div>' +
           '</div>' +
         '</div>';
     }).join('');
   }
 
   grid.addEventListener('click', async function(e){
-    const btn = e.target.closest('.pcm-copy-btn');
-    if (!btn) return;
-    const text = btn.getAttribute('data-contact') || '';
-    try {
-      await navigator.clipboard.writeText(text);
-      showToast('연락처가 복사됐어요: ' + text);
-    } catch (err) {
-      showToast('복사에 실패했어요. 길게 눌러 직접 복사해주세요.');
+    const copyBtn = e.target.closest('.srm-copy-btn');
+    if (copyBtn) {
+      e.stopPropagation();
+      const text = copyBtn.getAttribute('data-contact') || '';
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('연락처가 복사됐어요: ' + text);
+      } catch (err) {
+        showToast('복사에 실패했어요. 길게 눌러 직접 복사해주세요.');
+      }
+      return;
+    }
+    const card = e.target.closest('.srm-card');
+    if (card) {
+      card.classList.toggle('flipped');
     }
   });
 
   searchEl.addEventListener('input', render);
-  groupFilterEl.addEventListener('change', function(){
-    currentGroupFilter = groupFilterEl.value;
+  brandFilterEl.addEventListener('change', function(){
+    currentBrandFilter = brandFilterEl.value;
     render();
   });
 
@@ -337,12 +383,14 @@
   }
   function closeModal(){
     modalBackdrop.classList.remove('open');
-    document.getElementById('pcmFormGroup').value = '';
-    document.getElementById('pcmFormMember').value = '';
-    document.getElementById('pcmFormEra').value = '';
-    document.getElementById('pcmFormPrice').value = '';
-    document.getElementById('pcmFormDesc').value = '';
-    document.getElementById('pcmFormContact').value = '';
+    document.getElementById('srmFormBrand').value = '';
+    document.getElementById('srmFormModel').value = '';
+    document.getElementById('srmFormSize').value = '';
+    document.getElementById('srmFormCondition').value = '새제품';
+    document.getElementById('srmFormPrice').value = '';
+    document.getElementById('srmFormImage').value = '';
+    document.getElementById('srmFormDesc').value = '';
+    document.getElementById('srmFormContact').value = '';
   }
 
   openModalBtn.addEventListener('click', openModal);
@@ -360,15 +408,17 @@
 
   submitBtn.addEventListener('click', async function(){
     const selectedType = typeWantedBtn.classList.contains('active') ? 'wanted' : 'sell';
-    const group = document.getElementById('pcmFormGroup').value.trim();
-    const member = document.getElementById('pcmFormMember').value.trim();
-    const era = document.getElementById('pcmFormEra').value.trim();
-    const price = document.getElementById('pcmFormPrice').value.trim();
-    const description = document.getElementById('pcmFormDesc').value.trim();
-    const contact = document.getElementById('pcmFormContact').value.trim();
+    const brand = document.getElementById('srmFormBrand').value.trim();
+    const model = document.getElementById('srmFormModel').value.trim();
+    const size = document.getElementById('srmFormSize').value.trim();
+    const condition = document.getElementById('srmFormCondition').value;
+    const price = document.getElementById('srmFormPrice').value.trim();
+    const imageUrl = document.getElementById('srmFormImage').value.trim();
+    const description = document.getElementById('srmFormDesc').value.trim();
+    const contact = document.getElementById('srmFormContact').value.trim();
 
-    if (!group || !member) {
-      showToast('그룹과 멤버는 꼭 입력해주세요.');
+    if (!brand || !model) {
+      showToast('브랜드와 모델명은 꼭 입력해주세요.');
       return;
     }
 
@@ -379,7 +429,7 @@
       const res = await fetch('/api/listings', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ type: selectedType, group, member, era, price: price || null, description, contact }),
+        body: JSON.stringify({ type: selectedType, brand, model, size, condition, price: price || null, description, contact, imageUrl }),
       });
       if (!res.ok) throw new Error('등록 실패');
       await loadListings();

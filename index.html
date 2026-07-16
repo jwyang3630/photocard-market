@@ -144,6 +144,10 @@
   .srm-btn-submit { background: var(--ink); color: var(--text); }
   .srm-btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
   .srm-notice { font-size: 11px; color: #8A8474; margin-top: 10px; line-height: 1.5; }
+  .srm-upload-status { font-size: 11.5px; color: #6B6558; margin-top: 6px; }
+  .srm-upload-status.error { color: var(--sell); }
+  .srm-upload-status.success { color: #2A9D6F; }
+  .srm-upload-preview { margin-top: 8px; width: 100%; max-height: 160px; object-fit: cover; border-radius: 8px; border: 1px solid #DEDACC; }
   .srm-toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--ink); padding: 9px 16px; border-radius: 999px; font-size: 12.5px; font-weight: 600; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.25s ease, top 0.25s ease; }
   .srm-toast.show { opacity: 1; top: 26px; }
 
@@ -212,7 +216,12 @@
       </select>
     </div>
     <div class="srm-field"><label id="srmPriceLabel">희망 가격 (원)</label><input id="srmFormPrice" type="number" min="0" placeholder="예: 120000" /></div>
-    <div class="srm-field"><label>실물 사진 URL</label><input id="srmFormImage" placeholder="네이버 블로그/이미지 호스팅 링크 (http로 시작)" /></div>
+    <div class="srm-field">
+      <label>실물 사진</label>
+      <input id="srmFormImageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+      <div class="srm-upload-status" id="srmUploadStatus"></div>
+      <img id="srmUploadPreview" class="srm-upload-preview" style="display:none;" alt="업로드 미리보기" />
+    </div>
     <div class="srm-field"><label>설명</label><textarea id="srmFormDesc" placeholder="박스 유무, 하자 여부, 구매처 등을 적어주세요"></textarea></div>
     <div class="srm-field"><label>연락 방법</label><input id="srmFormContact" placeholder="오픈채팅 링크, 카톡 ID, 인스타 계정 등 자유롭게" /></div>
 
@@ -230,6 +239,8 @@
   let currentType = 'all';
   let currentBrandFilter = '';
   let formType = 'sell';
+  let uploadedImageUrl = '';
+  let isUploading = false;
 
   const grid = document.getElementById('srmGrid');
   const countEl = document.getElementById('srmCount');
@@ -244,6 +255,9 @@
   const typeWantedBtn = document.getElementById('srmTypeWanted');
   const priceLabel = document.getElementById('srmPriceLabel');
   const toast = document.getElementById('srmToast');
+  const imageFileEl = document.getElementById('srmFormImageFile');
+  const uploadStatusEl = document.getElementById('srmUploadStatus');
+  const uploadPreviewEl = document.getElementById('srmUploadPreview');
 
   function showToast(msg){
     toast.textContent = msg;
@@ -256,6 +270,42 @@
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
     });
   }
+
+  imageFileEl.addEventListener('change', async function(){
+    const file = imageFileEl.files && imageFileEl.files[0];
+    uploadedImageUrl = '';
+    uploadPreviewEl.style.display = 'none';
+    if (!file) {
+      uploadStatusEl.textContent = '';
+      uploadStatusEl.className = 'srm-upload-status';
+      return;
+    }
+
+    uploadStatusEl.textContent = '업로드 중...';
+    uploadStatusEl.className = 'srm-upload-status';
+    isUploading = true;
+
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        throw new Error((data && data.message) || '업로드 실패');
+      }
+      uploadedImageUrl = data.url;
+      uploadStatusEl.textContent = '업로드 완료';
+      uploadStatusEl.className = 'srm-upload-status success';
+      uploadPreviewEl.src = data.url;
+      uploadPreviewEl.style.display = 'block';
+    } catch (err) {
+      uploadStatusEl.textContent = '업로드 실패: ' + err.message + ' (다시 선택해주세요)';
+      uploadStatusEl.className = 'srm-upload-status error';
+      imageFileEl.value = '';
+    } finally {
+      isUploading = false;
+    }
+  });
 
   async function loadListings(){
     countEl.textContent = '불러오는 중...';
@@ -388,9 +438,14 @@
     document.getElementById('srmFormSize').value = '';
     document.getElementById('srmFormCondition').value = '새제품';
     document.getElementById('srmFormPrice').value = '';
-    document.getElementById('srmFormImage').value = '';
     document.getElementById('srmFormDesc').value = '';
     document.getElementById('srmFormContact').value = '';
+    imageFileEl.value = '';
+    uploadedImageUrl = '';
+    uploadStatusEl.textContent = '';
+    uploadStatusEl.className = 'srm-upload-status';
+    uploadPreviewEl.style.display = 'none';
+    uploadPreviewEl.src = '';
   }
 
   openModalBtn.addEventListener('click', openModal);
@@ -413,12 +468,16 @@
     const size = document.getElementById('srmFormSize').value.trim();
     const condition = document.getElementById('srmFormCondition').value;
     const price = document.getElementById('srmFormPrice').value.trim();
-    const imageUrl = document.getElementById('srmFormImage').value.trim();
+    const imageUrl = uploadedImageUrl;
     const description = document.getElementById('srmFormDesc').value.trim();
     const contact = document.getElementById('srmFormContact').value.trim();
 
     if (!brand || !model) {
       showToast('브랜드와 모델명은 꼭 입력해주세요.');
+      return;
+    }
+    if (isUploading) {
+      showToast('사진 업로드가 끝날 때까지 잠시만 기다려주세요.');
       return;
     }
 
